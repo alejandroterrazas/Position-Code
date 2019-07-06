@@ -1,0 +1,35 @@
+nformation about file formats for Cheetah video
+
+UInt16 swstx Value indicating the beginning of a record. Always 0x800 (2048).
+UInt16 swid ID for the originating system of this record.
+UInt16 swdata_size Size of a VideoRec in bytes.
+UInt64 qwTimeStamp Cheetah timestamp for this record. This value is in microseconds.
+14 + 1600 2 4 4 4 200
+UInt32[] dwPoints Points with the color bitfield values for this record. This is a 400
+element array. See Video Tracker Bitfield Information below.
+
+Int16 sncrc Unused*
+
+Int32 dnextracted_x Extracted X location of the target being tracked.
+Int32 dnextracted_y Extracted Y location of the target being tracked.
+Int32 dnextracted_angle The calculated head angle in degrees clockwise from the positive Y
+axis. Zero will be assigned if angle tracking is disabled.**
+
+Int32[] dntargets Colored targets using the samebitfield format used by the dwPoints
+array. Instead of transitions, the bitfield indicates the colors that make
+up each particular target and the center point of that target. This is a
+50 element array sorted by size from largest (index 0) to smallest
+(index 49). A target value of 0 means that no target is present in that
+index location. See Video Tracker Bitfield Information below.
+
+Video Tracker Bitfield Information:
+The pixel data consists of four hundred 32 bit values (one 32 bit value per pixel). The target data
+consists of fifty 32 bit values. These data have the same bit-field format which means that the 32 bit
+value is broken up into sub data to describe the X location (pixel number in the line), Y location (line
+number  of the frame) and the tracker colors which were above and below threshold.
+
+The X and Y values are allocated 12 bits each, but their maximum value is determined by the resolution
+that is used when tracking. See the header of your file for information about the resolution used whenyour file was recorded. The other bits indicate which of the color values were above (1) or below (0)
+their respective threshold setting. The layout of these bit fields can be visualized by the following:
+"""
+                     
