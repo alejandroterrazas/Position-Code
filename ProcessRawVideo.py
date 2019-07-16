@@ -42,6 +42,8 @@ def outputPrePVD(outfile, data, ts, plotit, xlim, ylim, applymask=False):
   img = np.zeros([640,480])
 
   for ii,targets in enumerate(data):
+    if ii%100 == 0:
+       print("Processing record # ", ii)
     for t in targets:
       write_rec = False
       line = format(t,'032b')
