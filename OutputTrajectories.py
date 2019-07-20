@@ -4,8 +4,28 @@ import sys
 
 
 '''
-Program to make ascii pvd (position, velocity, direction) file into individual
-trajectories. 
+OutputTrajectories.py
+Program to turn  ascii pvd (position, velocity, direction) file into individual
+trajectories.
+
+The program output two numpy otuput files for each pvd file input: 
+
+   1) _MOVING.npz
+   2) _NOTMOVING.npz
+
+These represent epochs where the rat is running on the maze or stopped.  
+The main part of the program involves grouping consecutive timestamps
+and smoothing over small blips of a few timestamps that are not significant
+stops epochs or moving epochs.
+
+The program accepts two command lin inputs: 
+ 1) the PVD file to proessing  and
+ 2) an optional flag "plot" that results in the program ploting
+ every trajectory (good for verifying but can result in many plots 
+ that must be exited each time)  
+
+Note: the PVD file is created in the view_video.sh script that either downloads
+the PVD file or creates it fresh depending on flags supplied to view_video.sh
 '''
 
 def group_consecutives(vals, step=1):
@@ -22,8 +42,8 @@ def group_consecutives(vals, step=1):
         expect = v + step
     return result
 
-plotit = sys.argv[2]
 pvdfile = sys.argv[1]
+plotit = sys.argv[2]
 
 data = open(pvdfile, "r")
 
@@ -39,35 +59,18 @@ x  = PVD[:,1].astype(int)
 y = PVD[:,2].astype(int)
 
 plt.plot(x,y,'r.')
+plt.ylim([0,480])
+plt.xlim([0,640])
 plt.show()
  
-#with open(pvdfile, 'rb') as f:
-#    n_lines = sum(1 for line in f)
-#    f.close()
-#    print(n_lines)
-#    ts = np.zeros(n_lines, dtype=np.uint64)
-#    x = np.zeros(n_lines)
-#    y = np.zeros(n_lines)
 
-#with open(pvdfile, 'rb') as f:
-#    for i,line in enumerate(f):
-#      lineparts=(line.split())
-#      ts[i]=lineparts[0]
-#      x[i]=lineparts[1]
-#      y[i]=lineparts[2]
-#f.close()
-    
-#xdiff = np.abs(np.diff(x))
-#print(xdiff)
+window_size = 5000
+xdiff = np.abs(np.diff(np.convolve(x,  np.ones(window_size, 
+                       dtype=np.int), 'valid')))
 
+ydiff = np.abs(np.diff(np.convolve(y, np.ones(window_size,
+                                   dtype=np.int), 'valid')))
 
-#plt.hist(np.diff(ts))
-#plt.show()
-xdiff = np.abs(np.diff(np.convolve(x,  np.ones(3000, dtype=np.int), 'valid')))
-ydiff = np.abs(np.diff(np.convolve(y, np.ones(3000, dtype=np.int), 'valid')))
-
-#xdiff = np.abs(np.convolve(np.diff(x), np.ones(300, dtype=np.int), 'valid'))
-#ydiff = np.abs(np.convolve(np.diff(y), np.ones(300, dtype=np.int), 'valid'))
 totdist = xdiff+ydiff
 
 inotmoving = np.where(totdist<20)[0]
@@ -92,10 +95,10 @@ for group in grouped:
         plt.show()
 
 
-outfile = pvdfile.replace('.ascii', '_NOTMOVING')
+outfile = pvdfile.replace('.pvd', '_NOTMOVING')
 np.savez(outfile, starts, stops)
 
-imoving = np.where(totdist>20)[0]
+imoving = np.where(totdist>40)[0]
 grouped = group_consecutives(imoving)
 
 starts = []
@@ -114,7 +117,7 @@ for group in grouped:
         plt.show()
 
 
-outfile = pvdfile.replace('.ascii', '_MOVING')
+outfile = pvdfile.replace('.pvd', '_MOVING')
 np.savez(outfile, starts, stops)
 
 
