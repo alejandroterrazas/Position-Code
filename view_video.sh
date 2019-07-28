@@ -9,7 +9,7 @@
 # dowload the existing PVD files, if the PVD option is selected.
 
 # To run this script enter:
-#  1-the sname of the directory (e.g 10607/2019-6-26_7-26-49_10607)
+#  1-the name of the directory (e.g 10607/2019-6-26_7-26-49_10607)
 #  2-optional flags, (PVD to create a PVD file, skipping the creation of epochs
 #  If the position directory exists in the main directory, 
 #    you must delete it manually if you wish to start from scratch; otherwise, 

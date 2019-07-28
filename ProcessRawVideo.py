@@ -96,6 +96,9 @@ outputPrePVD("./RawData/maze_dwPout.ascii",
 outputPrePVD("./RawData/maze_dnTout.ascii",
              T, ts, 0, xlim, ylim,applymask=True)
 
+
+##combine sleep epochs into one big sleep session using the following
+
 P = list(dwP[:start]) + list(dwP[stop:])
 T = list(dnT[:start]) + list(dnT[stop:])
 
