@@ -19,6 +19,7 @@ def getTrackerXY_Points(fname):
  
     recsize = 1828
     nrecs = len(data)//recsize
+    print("number of records: ", nrecs)
     xloc = np.zeros(nrecs)
     yloc = np.zeros(nrecs)
     hdir = np.zeros(nrecs)
@@ -30,7 +31,7 @@ def getTrackerXY_Points(fname):
         yloc[i] = struct.unpack('i', data[recoffset+1619:recoffset+1623])[0]
         ts[i] = struct.unpack('q', data[recoffset+6:recoffset+14])[0]
 
-    return xloc, yloc, ts
+    return xloc.astype(int), yloc.astype(int), ts.astype(int)
 
 def readPVDfile(pvdfile):
   """reads NSMA PVD file and returns timestamps and x,y."""
@@ -76,7 +77,7 @@ def getVideoData(fname):
   
   with open(fname, 'rb') as f:
     data = f.read()[16384:]
-    f.close()
+  f.close()
   
   nrecords = int(len(data)/1828)
   print("Number of Records: {}".format(nrecords))
