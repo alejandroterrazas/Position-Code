@@ -23,10 +23,10 @@ def makeMaskfromTracker(xvals, yvals):
      #print(x,y)
      if (xlim[0] < x < xlim[1]) and (ylim[0] < y < ylim[1]):
         accumulate[x,y] +=1
-  mask[np.where(accumulate>5)] = 1
+  mask[np.where(accumulate>2)] = 1
  # mask = ndimage.binary_erosion(mask, structure=np.ones((30,30)))
-  mask = ndimage.binary_dilation(mask, structure=np.ones((10,50)))
-
+  mask = ndimage.binary_dilation(mask, structure=np.ones((30,30)))
+  #mask = ndimage.binary_erosion(mask, structure=np.ones((60,30)))
   return mask
 
 
@@ -48,8 +48,8 @@ def makeMask(data):
 
   mask[np.where(accumulate>10)] = 1
   #erode and dilate mask to find outline of maze
-  mask = ndimage.binary_erosion(mask, structure=np.ones((30,30)))
-  mask = ndimage.binary_dilation(mask, structure=np.ones((10,50)))
+  #mask = ndimage.binary_erosion(mask, structure=np.ones((30,30)))
+  mask = ndimage.binary_dilation(mask, structure=np.ones((30,30)))
  
   return mask
 
@@ -61,10 +61,11 @@ def outputPrePVDfromTracker(outfile, xvals, yvals, ts,
 
   for ii, (x, y) in enumerate(zip(xvals, yvals)):
     write_rec = False
+    #print("apply maks", applymask)
     if (xlim[0] < x < xlim[1]) and (ylim[0] < y < ylim[1]):
-    
+
       if applymask==True:
-        if mask[x,y] == 1:
+        if trackermask[x,y] == 1:
            write_rec = True
       if applymask==False:
          write_rec = True
@@ -115,8 +116,8 @@ def outputPrePVD(outfile, data, ts, plotit, xlim, ylim, applymask=False):
 ## check ylim
 
 xlim = [0, 640]
-ylim = [0, 480]
-#ylim = [250, 480]
+#ylim = [0, 480]
+ylim = [240, 480]
 
 npzfile = np.load('./RawData/EPOCHS.npz')
 start = npzfile['arr_0'].astype(int)
@@ -130,10 +131,8 @@ T = list(dnT[start:stop])
 ts = list(timestamps[start:stop])
 
 mask = makeMask(P)
-np.savez("./RawData/mask", mask)
-
-#plt.imshow(mask)
-#plt.show()
+plt.imshow(mask)
+plt.show()
 outputPrePVD("./RawData/maze_dwPout.ascii", 
                P, ts, 0, xlim, ylim,applymask=True)
 outputPrePVD("./RawData/maze_dnTout.ascii",
@@ -154,22 +153,22 @@ outputPrePVD("./RawData/sleep_dnTout.ascii",
              T, ts, 0, xlim, ylim)
  
 x, y, ts = vu.getTrackerXY_Points(videofile)
-print("x: ", x, "y: ", y)
+#print("x: ", x, "y: ", y)
 
 x_pix = np.round(x/(np.max(x)/640)).astype(int)
 y_pix = np.round(y/(np.max(y)/480)).astype(int)
 
-print("x_pix: ", x_pix, "y_pix: ", y_pix)
+#print("x_pix: ", x_pix, "y_pix: ", y_pix)
 x = list(x_pix[start:stop])
 y = list(y_pix[start:stop])
 ts = list(ts[start:stop])
-mask = makeMaskfromTracker(x, y)
-plt.imshow(mask)
+trackermask = makeMaskfromTracker(x, y)
+plt.imshow(trackermask)
 plt.show()
-np.savez("./RawData/mask", mask)
+np.savez("./RawData/mask", mask, trackermask)
 
 outputPrePVDfromTracker("./RawData/maze_trackerout.ascii",
-                          x,y, ts, 0, xlim, ylim,applymask=True)
+                          x,y, ts, 0, xlim, ylim, applymask=True)
 
 
 ##combine sleep epochs into one big sleep session using the following

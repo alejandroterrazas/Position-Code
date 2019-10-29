@@ -55,9 +55,9 @@ else
    fi
    if [ "$2" == "PVD" ]
    then
-    aws s3 cp s3://narp-alext/$1/ ./RawDatat/ --exclude '*' --include 'VT1.Nvt' --recursive 
+    aws s3 cp s3://narp-alext/$1/ ./RawData/ --exclude '*' --include 'VT1.Nvt' --recursive 
     python ProcessRawVideo.py
     matlab -nodisplay -nodesktop -nosplash -r "run ./runNSMAVideo.m"
-    aws s3 cp ./RawData/ s3://narp-alext/$1/POSiITION --exclude '*' --include '*.pvd' --include '*.npz' --recursive
+    aws s3 cp ./RawData/ s3://narp-alext/$1/POSITION --exclude '*' --include '*.pvd' --include '*.npz' --recursive
    fi
 fi
