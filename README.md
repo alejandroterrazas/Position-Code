@@ -7,4 +7,4 @@ e.g., ./view_video 10607/2019-6-26_7-26-40_10607
 
 2) The script will run VideoSliderPlot.py Note: This program will help you segment the data into sleep1, maze and sleep 2 epochs
 
-3) 
+
